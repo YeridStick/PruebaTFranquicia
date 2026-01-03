@@ -8,6 +8,7 @@ spring:
   profiles:
     active: "local"
 
+adapters:
   r2dbc:
     postgresql:
       host: ${DB_HOST:gondola.proxy.rlwy.net}
@@ -16,11 +17,11 @@ spring:
       schema: ${DB_SCHEMA:public}
       username: ${DB_USER:postgres}
       password: ${DB_PASSWORD:KlCadXcunKSraYhTlNuzXcWNBOkhscWD}
+    connection-pool:
+      initial-size: ${CONN_POOL_INITIAL_SIZE:12}
+      max-size: ${CONN_POOL_MAX_SIZE:15}
+      max-idle-time: ${CONN_POOL_IDLE_TIME:30}
 
-  connection-pool:
-    initial-size: ${CONN_POOL_INITIAL_SIZE:12}
-    max-size: ${CONN_POOL_MAX_SIZE:15}
-    max-idle-time: ${CONN_POOL_IDLE_TIME:30}
 
 management:
   endpoints:
