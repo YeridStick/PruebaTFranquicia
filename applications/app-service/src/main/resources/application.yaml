@@ -5,24 +5,23 @@ spring:
     name: "PruebaFranquicia"
   devtools:
     add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
   profiles:
     active: "local"
+
   r2dbc:
     postgresql:
-      host: "gondola.proxy.rlwy.net"
-      port: 39683
-      database: "railway"
-      username: "postgres"
-      password: "KlCadXcunKSraYhTlNuzXcWNBOkhscWD"
-      schema: "public"
+      host: ${DB_HOST:gondola.proxy.rlwy.net}
+      port: ${DB_PORT:39683}
+      database: ${DB_NAME:railway}
+      schema: ${DB_SCHEMA:public}
+      username: ${DB_USER:postgres}
+      password: ${DB_PASSWORD:KlCadXcunKSraYhTlNuzXcWNBOkhscWD}
+
   connection-pool:
-    initial-size: 12
-    max-size: 15
-    max-idle-time: 1800
+    initial-size: ${CONN_POOL_INITIAL_SIZE:12}
+    max-size: ${CONN_POOL_MAX_SIZE:15}
+    max-idle-time: ${CONN_POOL_IDLE_TIME:30}
+
 management:
   endpoints:
     web:

@@ -1,14 +1,21 @@
 package co.franquicia.r2dbc.config;
 
-// TODO: Load properties from the application.yaml file or from secrets manager
-// import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-// @ConfigurationProperties(prefix = "adapters.r2dbc")
-public record PostgresqlConnectionProperties(
-        String host,
-        Integer port,
-        String database,
-        String schema,
-        String username,
-        String password) {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PostgresqlConnectionProperties {
+
+    private String database;
+    private String schema;
+    private String username;
+    private String password;
+    private String host;
+    private Integer port;
+
 }

@@ -32,13 +32,13 @@ public class PostgreSQLConnectionPool {
     @Value("${spring.r2dbc.postgresql.schema}")
     private String schema;
 
-    @Value("${spring.connection-pool.initial-size:12}")
+    @Value("${spring.connection-pool.initial-size}")
     private int initialSize;
 
-    @Value("${spring.connection-pool.max-size:15}")
+    @Value("${spring.connection-pool.max-size}")
     private int maxSize;
 
-    @Value("${spring.connection-pool.max-idle-time:1800}")
+    @Value("${spring.connection-pool.max-idle-time}")
     private int maxIdleTime;
 
     @Bean
