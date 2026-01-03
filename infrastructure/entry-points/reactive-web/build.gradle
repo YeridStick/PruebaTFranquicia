@@ -1,0 +1,20 @@
+dependencies {
+    implementation project(':usecase')
+    implementation project(':model')
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework:spring-tx'
+
+    // ✅ Jackson para ObjectMapper
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // ✅ AGREGAR ESTA LÍNEA - Support para Java Time (LocalDateTime, Instant, etc)
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // Testing completo
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}

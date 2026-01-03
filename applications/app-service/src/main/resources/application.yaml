@@ -1,0 +1,36 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: "PruebaFranquicia"
+  devtools:
+    add-properties: false
+  h2:
+    console:
+      enabled: true
+      path: "/h2"
+  profiles:
+    active: "local"
+  r2dbc:
+    postgresql:
+      host: "gondola.proxy.rlwy.net"
+      port: 39683
+      database: "railway"
+      username: "postgres"
+      password: "KlCadXcunKSraYhTlNuzXcWNBOkhscWD"
+      schema: "public"
+  connection-pool:
+    initial-size: 12
+    max-size: 15
+    max-idle-time: 1800
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
