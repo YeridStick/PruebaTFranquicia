@@ -5,6 +5,7 @@ import co.franquicia.model.franquicia.gateways.FranquiciaRepository;
 import co.franquicia.r2dbc.entity.FranquiciaData;
 import co.franquicia.r2dbc.helper.ReactiveAdapterOperations;
 import co.franquicia.r2dbc.repository.ReactiveFranquiciaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 public class FranquiciasAdapter extends ReactiveAdapterOperations<
         Franquicia/* change for domain model */,
         FranquiciaData/* change for adapter model */,
@@ -41,12 +43,14 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
         return repository.findByNombre(nombre)
                 .flatMap(existing -> Mono.<FranquiciaData>error(new IllegalStateException("Franquicia ya existe")))
                 .switchIfEmpty(Mono.defer(() -> {
+                    log.info("Mpiando para guardar");
                     var data = FranquiciaData.builder()
                             .id(UUID.randomUUID().toString())
                             .nombre(nombre)
                             .createdAt(Instant.now())
                             .updatedAt(Instant.now())
                             .build();
+                    log.info(data.getNombre());
                     return repository.save(data);
                 }))
                 .map(this::toEntity)

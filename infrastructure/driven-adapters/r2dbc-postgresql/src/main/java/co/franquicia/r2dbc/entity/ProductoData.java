@@ -33,9 +33,9 @@ public class ProductoData {
     @Column
     private int stock;
 
-    @Column
+    @Column("created_at")
     private Instant createdAt;
 
-    @Column
+    @Column("updated_at")
     private Instant updatedAt;
 }

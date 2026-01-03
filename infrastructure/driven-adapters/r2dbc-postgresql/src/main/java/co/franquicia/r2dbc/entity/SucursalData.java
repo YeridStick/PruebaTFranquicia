@@ -27,9 +27,9 @@ public class SucursalData {
     @Column
     private String nombre;
 
-    @Column
+    @Column("created_at")
     private Instant createdAt;
 
-    @Column
+    @Column("updated_at")
     private Instant updatedAt;
 }
