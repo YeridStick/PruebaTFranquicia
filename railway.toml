@@ -1,0 +1,10 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "deployment/Dockerfile"
+
+[deploy]
+startCommand = ""
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
