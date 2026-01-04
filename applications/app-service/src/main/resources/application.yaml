@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${PORT:8082}
 spring:
   application:
     name: "PruebaFranquicia"
@@ -39,5 +39,6 @@ management:
     health:
       probes:
         enabled: true
+      show-details: always
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"

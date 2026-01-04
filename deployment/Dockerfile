@@ -20,5 +20,7 @@ ENV DB_HOST=gondola.proxy.rlwy.net \
     DB_SCHEMA=public \
     DB_USER=postgres \
     DB_PASSWORD=KlCadXcunKSraYhTlNuzXcWNBOkhscWD
-EXPOSE 8082
-ENTRYPOINT [ "/bin/sh", "-c", "java $JAVA_OPTS -jar /app/PruebaFranquicia.jar" ]
+
+# No especificar EXPOSE cuando se usa $PORT dinámico
+# Railway detecta automáticamente el puerto
+ENTRYPOINT [ "/bin/sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8082} -jar /app/PruebaFranquicia.jar" ]
