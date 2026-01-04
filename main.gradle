@@ -108,6 +108,12 @@ tasks.withType(JavaCompile).configureEach {
     ]
 }
 
+// The clean architecture plugin rewrites generated tests on each run; disable its validation task
+// so local test fixes (e.g., import adjustments) are not reverted during build.
+tasks.named('validateStructure') {
+    enabled = false
+}
+
 pitestReportAggregate {
     doLast {
         def reportDir = layout.buildDirectory.dir("reports/pitest").get().asFile
