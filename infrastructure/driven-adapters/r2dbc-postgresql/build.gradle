@@ -7,5 +7,8 @@ dependencies {
     implementation 'org.reactivecommons.utils:object-mapper-api:0.1.0'
 
     testImplementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+    testImplementation 'io.r2dbc:r2dbc-h2'
+    testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
-
