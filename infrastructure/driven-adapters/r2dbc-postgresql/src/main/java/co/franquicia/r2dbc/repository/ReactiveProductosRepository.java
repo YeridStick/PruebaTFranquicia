@@ -7,7 +7,9 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ReactiveProductosRepository extends ReactiveCrudRepository<ProductoData, String>,
+import java.util.UUID;
+
+public interface ReactiveProductosRepository extends ReactiveCrudRepository<ProductoData, UUID>,
         ReactiveQueryByExampleExecutor<ProductoData> {
 
     /**
@@ -16,15 +18,15 @@ public interface ReactiveProductosRepository extends ReactiveCrudRepository<Prod
      * @return Flux con todos los productos
      */
     @Query("SELECT * FROM producto WHERE sucursal_id = :sucursalId")
-    Flux<ProductoData> findBySucursalId(String sucursalId);
+    Flux<ProductoData> findBySucursalId(java.util.UUID sucursalId);
 
     /**
      * Busca un producto por nombre
      * @param nombre nombre del producto
      * @return Mono con el producto encontrado
      */
-    @Query("SELECT * FROM producto WHERE nombre = :nombre")
-    Mono<ProductoData> findByNombre(String nombre);
+    @Query("SELECT * FROM producto WHERE nombre ILIKE '%' || :nombre || '%'")
+    Flux<ProductoData> findByNombre(String nombre);
 
     /**
      * Busca productos de una sucursal que contengan el nombre especificado
@@ -33,7 +35,7 @@ public interface ReactiveProductosRepository extends ReactiveCrudRepository<Prod
      * @return Flux con los productos encontrados
      */
     @Query("SELECT * FROM producto WHERE sucursal_id = :sucursalId AND nombre ILIKE '%' || :nombre || '%'")
-    Flux<ProductoData> findBySucursalIdAndNombreContaining(String sucursalId, String nombre);
+    Flux<ProductoData> findBySucursalIdAndNombreContaining(java.util.UUID sucursalId, String nombre);
 
     /**
      * Busca productos con stock menor al especificado
@@ -49,7 +51,7 @@ public interface ReactiveProductosRepository extends ReactiveCrudRepository<Prod
      * @return Mono con el total
      */
     @Query("SELECT COUNT(*) FROM producto WHERE sucursal_id = :sucursalId")
-    Mono<Long> countBySucursalId(String sucursalId);
+    Mono<Long> countBySucursalId(java.util.UUID sucursalId);
 
     /**
      * Busca el producto más caro de una sucursal
@@ -57,5 +59,5 @@ public interface ReactiveProductosRepository extends ReactiveCrudRepository<Prod
      * @return Mono con el producto más caro
      */
     @Query("SELECT * FROM producto WHERE sucursal_id = :sucursalId ORDER BY precio DESC LIMIT 1")
-    Mono<ProductoData> findMostExpensiveInSucursal(String sucursalId);
+    Mono<ProductoData> findMostExpensiveInSucursal(java.util.UUID sucursalId);
 }

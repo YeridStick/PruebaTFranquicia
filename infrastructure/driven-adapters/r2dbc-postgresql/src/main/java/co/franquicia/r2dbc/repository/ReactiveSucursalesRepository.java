@@ -7,7 +7,9 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<SucursalData, String>,
+import java.util.UUID;
+
+public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<SucursalData, UUID>,
         ReactiveQueryByExampleExecutor<SucursalData> {
 
     /**
@@ -16,7 +18,7 @@ public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<Suc
      * @return Flux con todas las sucursales
      */
     @Query("SELECT * FROM sucursal WHERE franquicia_id = :franquiciaId")
-    Flux<SucursalData> findByFranquiciaId(String franquiciaId);
+    Flux<SucursalData> findByFranquiciaId(java.util.UUID franquiciaId);
 
     /**
      * Busca una sucursal por nombre
@@ -24,7 +26,7 @@ public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<Suc
      * @return Mono con la sucursal encontrada
      */
     @Query("SELECT * FROM sucursal WHERE nombre = :nombre")
-    Mono<SucursalData> findByNombre(String nombre);
+    Flux<SucursalData> findByNombre(String nombre);
 
     /**
      * Busca sucursales por nombre y franquicia
@@ -33,7 +35,7 @@ public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<Suc
      * @return Mono con la sucursal encontrada
      */
     @Query("SELECT * FROM sucursal WHERE nombre = :nombre AND franquicia_id = :franquiciaId")
-    Mono<SucursalData> findByNombreAndFranquiciaId(String nombre, String franquiciaId);
+    Mono<SucursalData> findByNombreAndFranquiciaId(String nombre, java.util.UUID franquiciaId);
 
     /**
      * Cuenta sucursales por franquicia
@@ -41,7 +43,7 @@ public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<Suc
      * @return Mono con el total
      */
     @Query("SELECT COUNT(*) FROM sucursal WHERE franquicia_id = :franquiciaId")
-    Mono<Long> countByFranquiciaId(String franquiciaId);
+    Mono<Long> countByFranquiciaId(java.util.UUID franquiciaId);
 
     /**
      * Busca sucursales que contengan el nombre especificado

@@ -24,10 +24,10 @@ public class RouterRest {
             ProductoHandler productoHandler) {
 
         return route(GET("/api/franquicias"), franquiciaHandler::obtenerTodas)
+                .andRoute(GET("/api/franquicias/contar"), franquiciaHandler::contar)
                 .andRoute(GET("/api/franquicias/{id}"), franquiciaHandler::obtenerPorId)
                 .andRoute(GET("/api/franquicias/nombre/{nombre}"), franquiciaHandler::obtenerPorNombre)
                 .andRoute(GET("/api/franquicias/buscar/{nombre}"), franquiciaHandler::buscarPorNombreContaining)
-                .andRoute(GET("/api/franquicias/contar"), franquiciaHandler::contar)
                 .andRoute(POST("/api/franquicias"), franquiciaHandler::crearFranquicia)
                 .andRoute(PUT("/api/franquicias/{id}"), franquiciaHandler::actualizarFranquicia)
                 .andRoute(DELETE("/api/franquicias/{id}"), franquiciaHandler::eliminarPorId)

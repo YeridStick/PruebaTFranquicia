@@ -82,9 +82,8 @@ public class FranquiciaUseCase {
      * @return Mono con la franquicia actualizada
      */
     public Mono<Franquicia> actualizarFranquicia(String franquiciaId, Franquicia cambios) {
-        return Mono.defer(() -> {
-                    validarId(franquiciaId).block();
-
+        return validarId(franquiciaId)
+                .then(Mono.defer(() -> {
                     if (cambios.getNombre() != null) {
                         String nombre = cambios.getNombre().trim();
                         if (nombre.isBlank()) {
@@ -93,7 +92,7 @@ public class FranquiciaUseCase {
                         cambios.setNombre(nombre);
                     }
                     return repository.actualizarFranquicia(franquiciaId, cambios);
-                })
+                }))
                 .doOnSubscribe(s -> logger.info(() -> "[actualizarFranquicia] id=" + franquiciaId))
                 .doOnError(e -> logger.severe("[actualizarFranquicia] error: " + e.getMessage()));
     }

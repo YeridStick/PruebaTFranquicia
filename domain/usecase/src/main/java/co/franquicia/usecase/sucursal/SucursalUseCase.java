@@ -71,10 +71,9 @@ public class SucursalUseCase {
      * @param nombre nombre de la sucursal
      * @return Mono con la sucursal encontrada
      */
-    public Mono<Sucursal> obtenerPorNombre(String nombre) {
+    public Flux<Sucursal> obtenerPorNombre(String nombre) {
         return validarNombre(nombre, "El nombre es obligatorio")
-                .then(Mono.defer(() -> repository.obtenerPorNombre(nombre.trim())))
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Sucursal no encontrada")))
+                .thenMany(repository.obtenerPorNombre(nombre.trim()))
                 .doOnSubscribe(s -> logger.info(() -> "[obtenerPorNombre] nombre=" + nombre))
                 .doOnError(e -> logger.severe("[obtenerPorNombre] error: " + e.getMessage()));
     }
@@ -98,9 +97,8 @@ public class SucursalUseCase {
      * @return Mono con la sucursal actualizada
      */
     public Mono<Sucursal> actualizarSucursal(String sucursalId, Sucursal cambios) {
-        return Mono.defer(() -> {
-                    validarId(sucursalId, "ID obligatorio").block();
-
+        return validarId(sucursalId, "ID obligatorio")
+                .then(Mono.defer(() -> {
                     if (cambios.getNombre() != null) {
                         String nombre = cambios.getNombre().trim();
                         if (nombre.isBlank()) {
@@ -109,7 +107,7 @@ public class SucursalUseCase {
                         cambios.setNombre(nombre);
                     }
                     return repository.actualizarSucursal(sucursalId, cambios);
-                })
+                }))
                 .doOnSubscribe(s -> logger.info(() -> "[actualizarSucursal] id=" + sucursalId))
                 .doOnError(e -> logger.severe("[actualizarSucursal] error: " + e.getMessage()));
     }

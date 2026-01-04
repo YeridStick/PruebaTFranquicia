@@ -13,14 +13,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Repository
 @Slf4j
 public class FranquiciasAdapter extends ReactiveAdapterOperations<
         Franquicia/* change for domain model */,
         FranquiciaData/* change for adapter model */,
-        String,
+        java.util.UUID,
         ReactiveFranquiciaRepository
 > implements FranquiciaRepository {
 
@@ -30,7 +29,12 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
          *  super(repository, mapper, d -> mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build());
          *  Or using mapper.map with the class of the object model
          */
-        super(repository, mapper, d -> mapper.map(d, Franquicia.class/* change for domain model */));
+        super(repository, mapper, d -> Franquicia.builder()
+                .id(d.getId() != null ? d.getId().toString() : null)
+                .nombre(d.getNombre())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
+                .build());
     }
 
     /**
@@ -43,14 +47,11 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
         return repository.findByNombre(nombre)
                 .flatMap(existing -> Mono.<FranquiciaData>error(new IllegalStateException("Franquicia ya existe")))
                 .switchIfEmpty(Mono.defer(() -> {
-                    log.info("Mpiando para guardar");
                     var data = FranquiciaData.builder()
-                            .id(UUID.randomUUID().toString())
                             .nombre(nombre)
                             .createdAt(Instant.now())
                             .updatedAt(Instant.now())
                             .build();
-                    log.info(data.getNombre());
                     return repository.save(data);
                 }))
                 .map(this::toEntity)
@@ -65,7 +66,8 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Franquicia> obtenerPorId(String id) {
-        return findById(id);
+        return repository.findById(java.util.UUID.fromString(id))
+                .map(this::toEntity);
     }
 
     /**
@@ -106,7 +108,7 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<String> eliminarPorId(String id) {
-        return repository.deleteById(id)
+        return repository.deleteById(java.util.UUID.fromString(id))
                 .thenReturn("Franquicia eliminada correctamente");
     }
 
@@ -129,7 +131,7 @@ public class FranquiciasAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Franquicia> actualizarFranquicia(String franquiciaId, Franquicia cambios) {
-        return repository.findById(franquiciaId)
+        return repository.findById(java.util.UUID.fromString(franquiciaId))
                 .flatMap(existente -> {
                     existente.setNombre(cambios.getNombre());
                     existente.setUpdatedAt(Instant.now());

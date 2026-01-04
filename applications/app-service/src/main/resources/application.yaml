@@ -7,6 +7,13 @@ spring:
     add-properties: false
   profiles:
     active: "local"
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:gondola.proxy.rlwy.net}:${DB_PORT:39683}/${DB_NAME:railway}?schema=${DB_SCHEMA:public}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:KlCadXcunKSraYhTlNuzXcWNBOkhscWD}
+  sql:
+    init:
+      mode: never
 
 adapters:
   r2dbc:
@@ -22,6 +29,13 @@ adapters:
       max-size: ${CONN_POOL_MAX_SIZE:15}
       max-idle-time: ${CONN_POOL_IDLE_TIME:30}
 
+logging:
+  level:
+    org.springframework.data.r2dbc: INFO
+    org.springframework.r2dbc.core: INFO
+    io.r2dbc.postgresql: WARN
+    io.r2dbc.postgresql.QUERY: WARN
+    io.r2dbc.postgresql.PARAM: WARN
 
 management:
   endpoints:

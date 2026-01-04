@@ -12,18 +12,23 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Repository
 public class SucursalesAdapter extends ReactiveAdapterOperations<
         Sucursal,
-                SucursalData,
-                String,
-                ReactiveSucursalesRepository
+        SucursalData,
+        java.util.UUID,
+        ReactiveSucursalesRepository
 > implements SucursalRepository {
 
     public SucursalesAdapter(ReactiveSucursalesRepository repository, ObjectMapper mapper) {
-        super(repository, mapper, d -> mapper.map(d, Sucursal.class));
+        super(repository, mapper, d -> Sucursal.builder()
+                .id(d.getId() != null ? d.getId().toString() : null)
+                .franquiciaId(d.getFranquiciaId() != null ? d.getFranquiciaId().toString() : null)
+                .nombre(d.getNombre())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
+                .build());
     }
 
     /**
@@ -34,12 +39,12 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Sucursal> crearSucursal(String franquiciaId, String nombre) {
-        return repository.findByNombreAndFranquiciaId(nombre, franquiciaId)
+        java.util.UUID franquiciaUuid = java.util.UUID.fromString(franquiciaId);
+        return repository.findByNombreAndFranquiciaId(nombre, franquiciaUuid)
                 .flatMap(existing -> Mono.<SucursalData>error(new IllegalStateException("Sucursal ya existe en esta franquicia")))
                 .switchIfEmpty(Mono.defer(() -> {
                     var data = SucursalData.builder()
-                            .id(UUID.randomUUID().toString())
-                            .franquiciaId(franquiciaId)
+                            .franquiciaId(franquiciaUuid)
                             .nombre(nombre)
                             .createdAt(Instant.now())
                             .updatedAt(Instant.now())
@@ -58,7 +63,8 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Sucursal> obtenerPorId(String id) {
-        return findById(id);
+        return repository.findById(java.util.UUID.fromString(id))
+                .map(this::toEntity);
     }
 
     /**
@@ -77,7 +83,7 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Flux<Sucursal> obtenerPorFranquicia(String franquiciaId) {
-        return repository.findByFranquiciaId(franquiciaId)
+        return repository.findByFranquiciaId(java.util.UUID.fromString(franquiciaId))
                 .map(this::toEntity);
     }
 
@@ -87,7 +93,7 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      * @return Mono con la sucursal encontrada
      */
     @Override
-    public Mono<Sucursal> obtenerPorNombre(String nombre) {
+    public Flux<Sucursal> obtenerPorNombre(String nombre) {
         return repository.findByNombre(nombre)
                 .map(this::toEntity);
     }
@@ -110,7 +116,7 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<String> eliminarPorId(String id) {
-        return repository.deleteById(id)
+        return repository.deleteById(java.util.UUID.fromString(id))
                 .thenReturn("Sucursal eliminada correctamente");
     }
 
@@ -122,7 +128,7 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Sucursal> actualizarSucursal(String sucursalId, Sucursal cambios) {
-        return repository.findById(sucursalId)
+        return repository.findById(java.util.UUID.fromString(sucursalId))
                 .flatMap(existente -> {
                     existente.setNombre(cambios.getNombre());
                     existente.setUpdatedAt(Instant.now());
@@ -140,6 +146,6 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Long> contarPorFranquicia(String franquiciaId) {
-        return repository.countByFranquiciaId(franquiciaId);
+        return repository.countByFranquiciaId(java.util.UUID.fromString(franquiciaId));
     }
 }

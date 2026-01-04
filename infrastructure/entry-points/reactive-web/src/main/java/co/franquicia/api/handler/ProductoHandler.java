@@ -59,11 +59,10 @@ public class ProductoHandler {
     public Mono<ServerResponse> obtenerPorNombre(ServerRequest serverRequest) {
         String nombre = serverRequest.pathVariable("nombre");
         return productoUseCase.obtenerPorNombre(nombre)
-                .flatMap(producto -> ServerResponse.ok()
+                .collectList()
+                .flatMap(productos -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(producto))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
+                        .bodyValue(productos))
                 .onErrorResume(e -> {
                     logger.severe("Error al obtener producto por nombre: " + e.getMessage());
                     return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)

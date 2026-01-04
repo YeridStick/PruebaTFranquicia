@@ -7,23 +7,31 @@ import co.franquicia.r2dbc.helper.ReactiveAdapterOperations;
 import co.franquicia.r2dbc.repository.ReactiveProductosRepository;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Repository
 public class ProductosAdapter extends ReactiveAdapterOperations<
         Producto,
         ProductoData,
-        String,
+        java.util.UUID,
         ReactiveProductosRepository
 > implements ProductoRepository {
 
     public ProductosAdapter(ReactiveProductosRepository repository, ObjectMapper mapper) {
-        super(repository, mapper, d -> mapper.map(d, Producto.class));
+        super(repository, mapper, d -> Producto.builder()
+                .id(d.getId() != null ? d.getId().toString() : null)
+                .sucursalId(d.getSucursalId() != null ? d.getSucursalId().toString() : null)
+                .nombre(d.getNombre())
+                .precio(d.getPrecio())
+                .stock(d.getStock())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
+                .build());
     }
 
     /**
@@ -36,12 +44,12 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Producto> crearProducto(String sucursalId, String nombre, long precio, int stock) {
-        return repository.findByNombre(nombre)
+        java.util.UUID sucursalUuid = java.util.UUID.fromString(sucursalId);
+        return repository.findByNombre(nombre).next()
                 .flatMap(existing -> Mono.<ProductoData>error(new IllegalStateException("Producto ya existe")))
                 .switchIfEmpty(Mono.defer(() -> {
                     var data = ProductoData.builder()
-                            .id(UUID.randomUUID().toString())
-                            .sucursalId(sucursalId)
+                            .sucursalId(sucursalUuid)
                             .nombre(nombre)
                             .precio(precio)
                             .stock(stock)
@@ -52,7 +60,9 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
                 }))
                 .map(this::toEntity)
                 .onErrorMap(DuplicateKeyException.class,
-                        e -> new IllegalStateException("El nombre del producto ya existe", e));
+                        e -> new IllegalStateException("El nombre del producto ya existe", e))
+                .onErrorMap(DataIntegrityViolationException.class,
+                        e -> new IllegalArgumentException("La sucursal no existe o es inválida", e));
     }
 
     /**
@@ -62,7 +72,8 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Producto> obtenerPorId(String id) {
-        return findById(id);
+        return repository.findById(java.util.UUID.fromString(id))
+                .map(this::toEntity);
     }
 
     /**
@@ -81,7 +92,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Flux<Producto> obtenerPorSucursal(String sucursalId) {
-        return repository.findBySucursalId(sucursalId)
+        return repository.findBySucursalId(java.util.UUID.fromString(sucursalId))
                 .map(this::toEntity);
     }
 
@@ -91,7 +102,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      * @return Mono con el producto encontrado
      */
     @Override
-    public Mono<Producto> obtenerPorNombre(String nombre) {
+    public Flux<Producto> obtenerPorNombre(String nombre) {
         return repository.findByNombre(nombre)
                 .map(this::toEntity);
     }
@@ -104,7 +115,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Flux<Producto> buscarPorNombreEnSucursal(String sucursalId, String nombre) {
-        return repository.findBySucursalIdAndNombreContaining(sucursalId, nombre)
+        return repository.findBySucursalIdAndNombreContaining(java.util.UUID.fromString(sucursalId), nombre)
                 .map(this::toEntity);
     }
 
@@ -126,7 +137,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Producto> obtenerMasCaro(String sucursalId) {
-        return repository.findMostExpensiveInSucursal(sucursalId)
+        return repository.findMostExpensiveInSucursal(java.util.UUID.fromString(sucursalId))
                 .map(this::toEntity);
     }
 
@@ -137,7 +148,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<String> eliminarPorId(String id) {
-        return repository.deleteById(id)
+        return repository.deleteById(java.util.UUID.fromString(id))
                 .thenReturn("Producto eliminado correctamente");
     }
 
@@ -149,7 +160,7 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Producto> actualizarProducto(String productoId, Producto cambios) {
-        return repository.findById(productoId)
+        return repository.findById(java.util.UUID.fromString(productoId))
                 .flatMap(existente -> {
                     existente.setNombre(cambios.getNombre());
                     existente.setPrecio(cambios.getPrecio());
@@ -169,6 +180,6 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
      */
     @Override
     public Mono<Long> contarPorSucursal(String sucursalId) {
-        return repository.countBySucursalId(sucursalId);
+        return repository.countBySucursalId(java.util.UUID.fromString(sucursalId));
     }
 }

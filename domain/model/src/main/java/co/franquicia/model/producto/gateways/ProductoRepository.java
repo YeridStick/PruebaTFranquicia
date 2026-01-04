@@ -9,7 +9,7 @@ public interface ProductoRepository {
     Mono<Producto> obtenerPorId(String id);
     Flux<Producto> obtenerTodos();
     Flux<Producto> obtenerPorSucursal(String sucursalId);
-    Mono<Producto> obtenerPorNombre(String nombre);
+    Flux<Producto> obtenerPorNombre(String nombre);
     Flux<Producto> buscarPorNombreEnSucursal(String sucursalId, String nombre);
     Flux<Producto> buscarPorStockBajo(int stock);
     Mono<Producto> obtenerMasCaro(String sucursalId);

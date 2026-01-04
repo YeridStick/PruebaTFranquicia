@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -15,7 +16,7 @@ import java.time.Instant;
 public class FranquiciaData {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Column
     private String nombre;

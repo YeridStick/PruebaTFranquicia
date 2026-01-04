@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Representa una sucursal de una franquicia.
@@ -19,10 +20,10 @@ import java.time.Instant;
 public class SucursalData {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Column("franquicia_id")
-    private String franquiciaId;
+    private UUID franquiciaId;
 
     @Column
     private String nombre;

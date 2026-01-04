@@ -7,7 +7,9 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ReactiveFranquiciaRepository extends ReactiveCrudRepository<FranquiciaData, String>,
+import java.util.UUID;
+
+public interface ReactiveFranquiciaRepository extends ReactiveCrudRepository<FranquiciaData, UUID>,
         ReactiveQueryByExampleExecutor<FranquiciaData> {
 
     /**

@@ -59,11 +59,10 @@ public class SucursalHandler {
     public Mono<ServerResponse> obtenerPorNombre(ServerRequest serverRequest) {
         String nombre = serverRequest.pathVariable("nombre");
         return sucursalUseCase.obtenerPorNombre(nombre)
-                .flatMap(sucursal -> ServerResponse.ok()
+                .collectList()
+                .flatMap(sucursales -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(sucursal))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
+                        .bodyValue(sucursales))
                 .onErrorResume(e -> {
                     logger.severe("Error al obtener sucursal por nombre: " + e.getMessage());
                     return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)

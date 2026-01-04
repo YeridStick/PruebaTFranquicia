@@ -76,10 +76,9 @@ public class ProductoUseCase {
      * @param nombre nombre del producto
      * @return Mono con el producto encontrado
      */
-    public Mono<Producto> obtenerPorNombre(String nombre) {
+    public Flux<Producto> obtenerPorNombre(String nombre) {
         return validarNombre(nombre, "El nombre es obligatorio")
-                .then(Mono.defer(() -> repository.obtenerPorNombre(nombre.trim())))
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Producto no encontrado")))
+                .thenMany(repository.obtenerPorNombre(nombre.trim()))
                 .doOnSubscribe(s -> logger.info(() -> "[obtenerPorNombre] nombre=" + nombre))
                 .doOnError(e -> logger.severe("[obtenerPorNombre] error: " + e.getMessage()));
     }
@@ -133,9 +132,8 @@ public class ProductoUseCase {
      * @return Mono con el producto actualizado
      */
     public Mono<Producto> actualizarProducto(String productoId, Producto cambios) {
-        return Mono.defer(() -> {
-                    validarId(productoId, "ID obligatorio").block();
-
+        return validarId(productoId, "ID obligatorio")
+                .then(Mono.defer(() -> {
                     if (cambios.getNombre() != null) {
                         String nombre = cambios.getNombre().trim();
                         if (nombre.isBlank()) {
@@ -153,7 +151,7 @@ public class ProductoUseCase {
                     }
 
                     return repository.actualizarProducto(productoId, cambios);
-                })
+                }))
                 .doOnSubscribe(s -> logger.info(() -> "[actualizarProducto] id=" + productoId))
                 .doOnError(e -> logger.severe("[actualizarProducto] error: " + e.getMessage()));
     }
