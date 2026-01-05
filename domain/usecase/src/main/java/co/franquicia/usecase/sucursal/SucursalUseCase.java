@@ -137,6 +137,16 @@ public class SucursalUseCase {
     }
 
     /**
+     * Cuenta todas las sucursales
+     * @return Mono con el total
+     */
+    public Mono<Long> contarTodas() {
+        return repository.contarTodas()
+                .doOnSubscribe(s -> logger.info("[contarTodasSucursales]"))
+                .doOnError(e -> logger.severe("[contarTodasSucursales] error: " + e.getMessage()));
+    }
+
+    /**
      * Valida que el nombre no sea nulo ni vacío
      * @param valor valor a validar
      * @param mensaje mensaje de error

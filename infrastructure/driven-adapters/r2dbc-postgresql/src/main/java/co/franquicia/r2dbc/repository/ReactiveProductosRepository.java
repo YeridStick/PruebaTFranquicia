@@ -60,4 +60,18 @@ public interface ReactiveProductosRepository extends ReactiveCrudRepository<Prod
      */
     @Query("SELECT * FROM producto WHERE sucursal_id = :sucursalId ORDER BY precio DESC LIMIT 1")
     Mono<ProductoData> findMostExpensiveInSucursal(java.util.UUID sucursalId);
+
+    /**
+     * Cuenta todos los productos
+     * @return Mono con el total
+     */
+    @Query("SELECT COUNT(*) FROM producto")
+    Mono<Long> countAll();
+
+    /**
+     * Suma total de stock en todos los productos
+     * @return Mono con la suma
+     */
+    @Query("SELECT COALESCE(SUM(stock), 0) FROM producto")
+    Mono<Long> sumStock();
 }

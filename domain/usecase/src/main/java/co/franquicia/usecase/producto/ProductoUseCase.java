@@ -181,6 +181,26 @@ public class ProductoUseCase {
     }
 
     /**
+     * Cuenta todos los productos
+     * @return Mono con el total
+     */
+    public Mono<Long> contarTodos() {
+        return repository.contarTodos()
+                .doOnSubscribe(s -> logger.info("[contarProductos]"))
+                .doOnError(e -> logger.severe("[contarProductos] error: " + e.getMessage()));
+    }
+
+    /**
+     * Suma total del stock
+     * @return Mono con la suma
+     */
+    public Mono<Long> sumarStock() {
+        return repository.sumarStock()
+                .doOnSubscribe(s -> logger.info("[sumarStockProductos]"))
+                .doOnError(e -> logger.severe("[sumarStockProductos] error: " + e.getMessage()));
+    }
+
+    /**
      * Valida que el nombre no sea nulo ni vacío
      * @param valor valor a validar
      * @param mensaje mensaje de error

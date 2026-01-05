@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.logging.Logger;
@@ -28,11 +29,7 @@ public class ProductoHandler {
                 .flatMap(productos -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productos))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener todos los productos: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener productos");
-                });
+                .doOnError(e -> logger.severe("Error al obtener todos los productos: " + e.getMessage()));
     }
 
     /**
@@ -44,13 +41,9 @@ public class ProductoHandler {
                 .flatMap(producto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(producto))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener producto por ID: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener producto");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener producto por ID: " + e.getMessage()));
     }
 
     /**
@@ -63,11 +56,7 @@ public class ProductoHandler {
                 .flatMap(productos -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productos))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener producto por nombre: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener producto");
-                });
+                .doOnError(e -> logger.severe("Error al obtener producto por nombre: " + e.getMessage()));
     }
 
     /**
@@ -80,13 +69,9 @@ public class ProductoHandler {
                 .flatMap(productos -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productos))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener productos por sucursal: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener productos");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener productos por sucursal: " + e.getMessage()));
     }
 
     /**
@@ -100,13 +85,9 @@ public class ProductoHandler {
                 .flatMap(productos -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productos))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al buscar productos: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al buscar productos");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al buscar productos: " + e.getMessage()));
     }
 
     /**
@@ -121,13 +102,9 @@ public class ProductoHandler {
                     .flatMap(productos -> ServerResponse.ok()
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(productos))
-                    .onErrorResume(e -> {
-                        logger.severe("Error al buscar productos con stock bajo: " + e.getMessage());
-                        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .bodyValue("Error al buscar productos");
-                    });
+                    .doOnError(e -> logger.severe("Error al buscar productos con stock bajo: " + e.getMessage()));
         } catch (NumberFormatException e) {
-            return ServerResponse.badRequest().bodyValue("Stock debe ser un número válido");
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock debe ser un número válido", e));
         }
     }
 
@@ -140,13 +117,9 @@ public class ProductoHandler {
                 .flatMap(producto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(producto))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener producto más caro: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener producto");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener producto más caro: " + e.getMessage()));
     }
 
     /**
@@ -164,13 +137,9 @@ public class ProductoHandler {
                 .flatMap(productoBd -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productoBd))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al crear producto: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al crear producto");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al crear producto: " + e.getMessage()));
     }
 
     /**
@@ -183,13 +152,9 @@ public class ProductoHandler {
                 .flatMap(productoActualizado -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(productoActualizado))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al actualizar producto: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al actualizar producto");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al actualizar producto: " + e.getMessage()));
     }
 
     /**
@@ -201,13 +166,9 @@ public class ProductoHandler {
                 .flatMap(mensaje -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(mensaje))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al eliminar producto: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al eliminar producto");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al eliminar producto: " + e.getMessage()));
     }
 
     /**
@@ -219,12 +180,8 @@ public class ProductoHandler {
                 .flatMap(total -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(total))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al contar productos: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al contar productos");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al contar productos: " + e.getMessage()));
     }
 }

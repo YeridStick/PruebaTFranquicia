@@ -148,4 +148,13 @@ public class SucursalesAdapter extends ReactiveAdapterOperations<
     public Mono<Long> contarPorFranquicia(String franquiciaId) {
         return repository.countByFranquiciaId(java.util.UUID.fromString(franquiciaId));
     }
+
+    /**
+     * Cuenta todas las sucursales
+     * @return Mono con el total
+     */
+    @Override
+    public Mono<Long> contarTodas() {
+        return repository.countAll();
+    }
 }

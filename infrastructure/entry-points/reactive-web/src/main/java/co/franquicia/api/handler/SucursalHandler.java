@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.logging.Logger;
@@ -28,11 +29,7 @@ public class SucursalHandler {
                 .flatMap(sucursales -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursales))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener todas las sucursales: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener sucursales");
-                });
+                .doOnError(e -> logger.severe("Error al obtener todas las sucursales: " + e.getMessage()));
     }
 
     /**
@@ -44,13 +41,9 @@ public class SucursalHandler {
                 .flatMap(sucursal -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursal))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener sucursal por ID: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener sucursal");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener sucursal por ID: " + e.getMessage()));
     }
 
     /**
@@ -63,11 +56,7 @@ public class SucursalHandler {
                 .flatMap(sucursales -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursales))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener sucursal por nombre: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener sucursal");
-                });
+                .doOnError(e -> logger.severe("Error al obtener sucursal por nombre: " + e.getMessage()));
     }
 
     /**
@@ -80,13 +69,9 @@ public class SucursalHandler {
                 .flatMap(sucursales -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursales))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener sucursales por franquicia: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener sucursales");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener sucursales por franquicia: " + e.getMessage()));
     }
 
     /**
@@ -99,11 +84,7 @@ public class SucursalHandler {
                 .flatMap(sucursales -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursales))
-                .onErrorResume(e -> {
-                    logger.severe("Error al buscar sucursales: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al buscar sucursales");
-                });
+                .doOnError(e -> logger.severe("Error al buscar sucursales: " + e.getMessage()));
     }
 
     /**
@@ -116,13 +97,9 @@ public class SucursalHandler {
                 .flatMap(sucursalBd -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursalBd))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al crear sucursal: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al crear sucursal");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al crear sucursal: " + e.getMessage()));
     }
 
     /**
@@ -135,13 +112,9 @@ public class SucursalHandler {
                 .flatMap(sucursalActualizada -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(sucursalActualizada))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al actualizar sucursal: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al actualizar sucursal");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al actualizar sucursal: " + e.getMessage()));
     }
 
     /**
@@ -153,13 +126,9 @@ public class SucursalHandler {
                 .flatMap(mensaje -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(mensaje))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al eliminar sucursal: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al eliminar sucursal");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al eliminar sucursal: " + e.getMessage()));
     }
 
     /**
@@ -171,12 +140,8 @@ public class SucursalHandler {
                 .flatMap(total -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(total))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al contar sucursales: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al contar sucursales");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al contar sucursales: " + e.getMessage()));
     }
 }

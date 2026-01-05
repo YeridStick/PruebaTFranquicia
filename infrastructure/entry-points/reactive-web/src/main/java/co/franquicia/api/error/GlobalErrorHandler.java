@@ -74,6 +74,7 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
     }
 
     private String mapMessage(Throwable e) {
+        if (e instanceof ResponseStatusException rse && rse.getReason() != null) return rse.getReason();
         if (e instanceof WebExchangeBindException) return "Error de validación";
         if (e instanceof ServerWebInputException)  return "Solicitud inválida";
         return e.getMessage() == null ? "Error" : e.getMessage();

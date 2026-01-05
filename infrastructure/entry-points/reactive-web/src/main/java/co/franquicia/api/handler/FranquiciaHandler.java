@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.logging.Logger;
@@ -28,11 +29,7 @@ public class FranquiciaHandler {
                 .flatMap(franquicias -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquicias))
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener todas las franquicias: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener franquicias");
-                });
+                .doOnError(e -> logger.severe("Error al obtener todas las franquicias: " + e.getMessage()));
     }
 
     /**
@@ -44,13 +41,9 @@ public class FranquiciaHandler {
                 .flatMap(franquicia -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquicia))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener franquicia por ID: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener franquicia por ID: " + e.getMessage()));
     }
 
     /**
@@ -62,13 +55,9 @@ public class FranquiciaHandler {
                 .flatMap(franquicia -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquicia))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.notFound().build())
-                .onErrorResume(e -> {
-                    logger.severe("Error al obtener franquicia por nombre: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al obtener franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al obtener franquicia por nombre: " + e.getMessage()));
     }
 
     /**
@@ -81,11 +70,7 @@ public class FranquiciaHandler {
                 .flatMap(franquicias -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquicias))
-                .onErrorResume(e -> {
-                    logger.severe("Error al buscar franquicias: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al buscar franquicias");
-                });
+                .doOnError(e -> logger.severe("Error al buscar franquicias: " + e.getMessage()));
     }
 
     /**
@@ -97,13 +82,9 @@ public class FranquiciaHandler {
                 .flatMap(franquiciaBd -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquiciaBd))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al crear franquicia: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al crear franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al crear franquicia: " + e.getMessage()));
     }
 
     /**
@@ -116,13 +97,9 @@ public class FranquiciaHandler {
                 .flatMap(franquiciaActualizada -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(franquiciaActualizada))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al actualizar franquicia: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al actualizar franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al actualizar franquicia: " + e.getMessage()));
     }
 
     /**
@@ -134,13 +111,9 @@ public class FranquiciaHandler {
                 .flatMap(mensaje -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(mensaje))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al eliminar franquicia: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al eliminar franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al eliminar franquicia: " + e.getMessage()));
     }
 
     /**
@@ -152,13 +125,9 @@ public class FranquiciaHandler {
                 .flatMap(mensaje -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(mensaje))
-                .onErrorResume(IllegalArgumentException.class, e ->
-                        ServerResponse.badRequest().bodyValue("Error: " + e.getMessage()))
-                .onErrorResume(e -> {
-                    logger.severe("Error al eliminar franquicia: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al eliminar franquicia");
-                });
+                .onErrorMap(IllegalArgumentException.class, e ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e))
+                .doOnError(e -> logger.severe("Error al eliminar franquicia: " + e.getMessage()));
     }
 
     /**
@@ -169,10 +138,6 @@ public class FranquiciaHandler {
                 .flatMap(total -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(total))
-                .onErrorResume(e -> {
-                    logger.severe("Error al contar franquicias: " + e.getMessage());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .bodyValue("Error al contar franquicias");
-                });
+                .doOnError(e -> logger.severe("Error al contar franquicias: " + e.getMessage()));
     }
 }

@@ -52,4 +52,11 @@ public interface ReactiveSucursalesRepository extends ReactiveCrudRepository<Suc
      */
     @Query("SELECT * FROM sucursal WHERE nombre ILIKE '%' || :nombre || '%'")
     Flux<SucursalData> findByNombreContaining(String nombre);
+
+    /**
+     * Cuenta todas las sucursales
+     * @return Mono con el total
+     */
+    @Query("SELECT COUNT(*) FROM sucursal")
+    Mono<Long> countAll();
 }

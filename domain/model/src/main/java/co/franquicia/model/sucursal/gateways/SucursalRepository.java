@@ -14,4 +14,5 @@ public interface SucursalRepository {
     Mono<String> eliminarPorId(String id);
     Mono<Sucursal> actualizarSucursal(String sucursalId, Sucursal cambios);
     Mono<Long> contarPorFranquicia(String franquiciaId);
+    Mono<Long> contarTodas();
 }

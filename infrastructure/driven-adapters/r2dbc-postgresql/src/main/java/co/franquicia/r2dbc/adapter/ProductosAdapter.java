@@ -182,4 +182,22 @@ public class ProductosAdapter extends ReactiveAdapterOperations<
     public Mono<Long> contarPorSucursal(String sucursalId) {
         return repository.countBySucursalId(java.util.UUID.fromString(sucursalId));
     }
+
+    /**
+     * Cuenta todos los productos
+     * @return Mono con el total
+     */
+    @Override
+    public Mono<Long> contarTodos() {
+        return repository.countAll();
+    }
+
+    /**
+     * Suma total de stock
+     * @return Mono con la suma
+     */
+    @Override
+    public Mono<Long> sumarStock() {
+        return repository.sumStock();
+    }
 }

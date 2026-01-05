@@ -1,5 +1,6 @@
 package co.franquicia.api.router;
 
+import co.franquicia.api.handler.DashboardHandler;
 import co.franquicia.api.handler.FranquiciaHandler;
 import co.franquicia.api.handler.ProductoHandler;
 import co.franquicia.api.handler.SucursalHandler;
@@ -21,7 +22,8 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(
             FranquiciaHandler franquiciaHandler,
             SucursalHandler sucursalHandler,
-            ProductoHandler productoHandler) {
+            ProductoHandler productoHandler,
+            DashboardHandler dashboardHandler) {
 
         return route(GET("/api/franquicias"), franquiciaHandler::obtenerTodas)
                 .andRoute(GET("/api/franquicias/contar"), franquiciaHandler::contar)
@@ -55,6 +57,9 @@ public class RouterRest {
                 .andRoute(GET("/api/sucursales/{sucursalId}/productos/contar"), productoHandler::contarPorSucursal)
                 .andRoute(POST("/api/sucursales/{sucursalId}/productos"), productoHandler::crearProducto)
                 .andRoute(PUT("/api/productos/{id}"), productoHandler::actualizarProducto)
-                .andRoute(DELETE("/api/productos/{id}"), productoHandler::eliminarPorId);
+                .andRoute(DELETE("/api/productos/{id}"), productoHandler::eliminarPorId)
+
+                // ============= DASHBOARD / MÉTRICAS =============
+                .andRoute(GET("/api/metrics/resumen"), dashboardHandler::obtenerResumen);
     }
 }

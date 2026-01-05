@@ -16,4 +16,6 @@ public interface ProductoRepository {
     Mono<String> eliminarPorId(String id);
     Mono<Producto> actualizarProducto(String productoId, Producto cambios);
     Mono<Long> contarPorSucursal(String sucursalId);
+    Mono<Long> contarTodos();
+    Mono<Long> sumarStock();
 }
